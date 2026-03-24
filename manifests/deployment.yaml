@@ -15,7 +15,7 @@ spec:
       labels:
         app: vaultcorp
     spec:
-      serviceAccountName: default
+      automountServiceAccountToken: false
       containers:
         - name: vaultcorp
           image: europe-west1-docker.pkg.dev/chas-devsecops-2026/vaultcorp/app:vulnerable
@@ -50,6 +50,10 @@ spec:
             runAsNonRoot: true
             runAsUser: 1000
             allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
           livenessProbe:
             httpGet:
               path: /health
