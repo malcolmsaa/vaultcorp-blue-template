@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: vaultcorp-blue-1
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/malcolmsaa/vaultcorp-blue-template
+    targetRevision: main
+    path: manifests
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: blue-1
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
