@@ -1,3 +1,4 @@
+# manifests/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -16,40 +17,48 @@ spec:
     spec:
       serviceAccountName: default
       containers:
-      - name: vaultcorp
-        image: europe-west1-docker.pkg.dev/chas-devsecops-2026/vaultcorp/app:vulnerable
-        ports:
-        - containerPort: 5000
-resources:
-  limits:
-    cpu: "500m"
-    memory: "256Mi"
-  requests:
-    cpu: "100m"
-    memory: "128Mi"
-securityContext:
-  runAsNonRoot: true
-  runAsUser: 1000
-  allowPrivilegeEscalation: false
-livenessProbe:
-  httpGet:
-    path: /health
-    port: 5000
-  initialDelaySeconds: 5
-  periodSeconds: 10
-
-readinessProbe:
-  httpGet:
-    path: /health
-    port: 5000
-  initialDelaySeconds: 5
-  periodSeconds: 10
-          runAsUser: 0
-        - name: DB_PASSWORD
-          value: "admin1234"
-        - name: WALLET_PRIVATE_KEY
-          value: "0xdeadbeef1337cafebabe"
-        - name: ENVIRONMENT
-          value: "production"
-
-
+        - name: vaultcorp
+          image: europe-west1-docker.pkg.dev/chas-devsecops-2026/vaultcorp/app:vulnerable
+          ports:
+            - containerPort: 5000
+          env:
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: vaultcorp-secrets
+                  key: SECRET_KEY
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: vaultcorp-secrets
+                  key: DB_PASSWORD
+            - name: WALLET_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: vaultcorp-secrets
+                  key: WALLET_PRIVATE_KEY
+            - name: ENVIRONMENT
+              value: "production"
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            allowPrivilegeEscalation: false
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10
