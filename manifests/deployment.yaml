@@ -20,15 +20,36 @@ spec:
         image: europe-west1-docker.pkg.dev/chas-devsecops-2026/vaultcorp/app:vulnerable
         ports:
         - containerPort: 5000
-        securityContext:
-          privileged: true
+resources:
+  limits:
+    cpu: "500m"
+    memory: "256Mi"
+  requests:
+    cpu: "100m"
+    memory: "128Mi"
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  allowPrivilegeEscalation: false
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 5000
+  initialDelaySeconds: 5
+  periodSeconds: 10
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 5000
+  initialDelaySeconds: 5
+  periodSeconds: 10
           runAsUser: 0
-        env:
-        - name: SECRET_KEY
-          value: "supersecret123"
         - name: DB_PASSWORD
           value: "admin1234"
         - name: WALLET_PRIVATE_KEY
           value: "0xdeadbeef1337cafebabe"
         - name: ENVIRONMENT
           value: "production"
+
+
