@@ -5,7 +5,7 @@ metadata:
   labels:
     app: vaultcorp
 spec:
-  type: NodePort
+type: ClusterIP
   selector:
     app: vaultcorp
   ports:
