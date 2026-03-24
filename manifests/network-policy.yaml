@@ -1,0 +1,15 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: vaultcorp-netpol
+  namespace: blue-1
+spec:
+  podSelector:
+    matchLabels:
+      app: vaultcorp
+  policyTypes:
+  - Ingress
+  ingress:
+  - from: []
+    ports:
+    - port: 5000
